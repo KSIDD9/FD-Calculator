@@ -1,38 +1,49 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from utils import cal_end_date
 
 #Function to get the user inputs and process the same.
 def get_user_inputs():
     
     
     #Getting the Principal Value, decimal format
-    PrinVal = input("Please enter the Princial Value of the Fixed Deposit:")
+    #PrinVal = input("Please enter the Princial Value of the Fixed Deposit:")
     
     
     #Geting the rate of interest, decimal format
-    IntRt = input("Please enter the Rate of Interest (%):")
-   
+    #IntRt = input("Please enter the Rate of Interest (%):")
     
-   #Getting the start date in dd-mm-yyyy format
+    #Getting the Investment Period
+    InvDur = {
+        "years": 2,
+        "months": 3,
+        "days": 15,
+        "total_days": 835  # rounded approximation using 365, 30.42 etc.
+        }
+    
+    #Getting the start date in dd-mm-yyyy format
     while True:
         try:
-            user_input = input("Please enter the Start Date of the Fixed Deposit (dd-mm-yyyy):")
-            SrtDt = datetime.strptime(user_input, "%d-%m-%Y")
+            user_Dtinput = input("Enter Start Date (dd-mm-yyyy) or type '0' to skip:")
+            if user_Dtinput == "0":
+                SrtDt = EndDt = None
+            else:
+                SrtDt = datetime.strptime(user_Dtinput, "%d-%m-%Y")
+                EndDt = cal_end_date(SrtDt, InvDur)
             break
         except ValueError:
-            print("Invalid Format, Please enter the date as dd-mm-yyyy")
-            
-   
-    #Getting the Investment Period
-    InvDur = input("Please enter the Period of Investment:")
+            print("Invalid Format, Please enter the date as dd-mm-yyyy")           
+     
     
     return {
-        "Principal" : PrinVal,
-        "Rate" : IntRt,
+        #"Principal" : PrinVal,
+        #"Rate" : IntRt,
+        "Duration" : InvDur,
         "Start_Date" : SrtDt,
-        "Duration" : InvDur
+        "End_Date" : EndDt
         }
+
 
               
 def main():
