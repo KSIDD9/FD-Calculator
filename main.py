@@ -2,24 +2,25 @@
 
 from datetime import datetime
 from utils import cal_end_date
+import fd_calculations as fdc
 
 #Function to get the user inputs and process the same.
 def get_user_inputs():
     
     
     #Getting the Principal Value, decimal format
-    #PrinVal = input("Please enter the Princial Value of the Fixed Deposit:")
+    PrinVal = int(input("Please enter the Princial Value of the Fixed Deposit:"))
     
     
     #Geting the rate of interest, decimal format
-    #IntRt = input("Please enter the Rate of Interest (%):")
+    IntRt = float(input("Please enter the Rate of Interest (%):"))
     
     #Getting the Investment Period
     InvDur = {
-        "years": 2,
-        "months": 3,
-        "days": 15,
-        "total_days": 835  # rounded approximation using 365, 30.42 etc.
+        "years": 0,
+        "months": 0,
+        "days": 0,
+        "total_days": 1000  # rounded approximation using 365, 30.42 etc.
         }
     
     #Getting the start date in dd-mm-yyyy format
@@ -37,8 +38,8 @@ def get_user_inputs():
      
     
     return {
-        #"Principal" : PrinVal,
-        #"Rate" : IntRt,
+        "Principal" : PrinVal,
+        "Rate" : IntRt,
         "Duration" : InvDur,
         "Start_Date" : SrtDt,
         "End_Date" : EndDt
@@ -55,6 +56,17 @@ def main():
        else:
            print(f"{key} : {value}")
     
+   mat_Val, totInt = fdc.singlePayout_calc(user_data["Principal"], user_data["Rate"], user_data["Duration"]["total_days"], 4)
+   print(f"Maturity Value is ₹{mat_Val:.2f} and the total interest is ₹{totInt:.2f}")
+   
+   tot_interest, int_payout = fdc.biannualPayout_calc(user_data["Principal"], user_data["Rate"], user_data["Duration"]["total_days"])
+   print(f"For Bi-Annual Payout, each payout is ₹{int_payout:.2f} and total interest earned is ₹{tot_interest:.2f}")
+   
+   tot_interest, int_payout = fdc.quarterlyPayout_calc(user_data["Principal"], user_data["Rate"], user_data["Duration"]["total_days"])
+   print(f"For Quarterly Payout, each payout is ₹{int_payout:.2f} and total interest earned is ₹{tot_interest:.2f}")
+   
+   tot_interest, int_payout = fdc.monthlyPayout_calc(user_data["Principal"], user_data["Rate"], user_data["Duration"]["total_days"])
+   print(f"For Monthly Payout, each payout is ₹{int_payout:.2f} and total interest earned is ₹{tot_interest:.2f}")
     
 if __name__ == "__main__":
     main()
