@@ -1,6 +1,20 @@
+# Virtual environments
+venv/
+.env/
+
+# Python cache
 __pycache__/
 *.pyc
 .spyproject/
 *.log
+
+# OS files
 .DS_Store
 *.tmp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Documents
+*.docx
+*.pdf
