@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from utils import cal_end_date, parse_duration
+import utils as ut
 import fd_calculations as fdc
+
+DAYS_IN_YEAR = 365
+QUARTERLY = 4
+BIANNUAL = 2
+PER_MONTH = 12
 
 #Function to get the user inputs and process the same.
 def get_user_inputs():
@@ -17,7 +22,7 @@ def get_user_inputs():
     #Getting the Investment Period
     while True:
         InvDurStrng = input("Please enter the Period of Investment as xY xM xD:")
-        InvDur = parse_duration(InvDurStrng)
+        InvDur = ut.parse_duration(InvDurStrng)
         if InvDur is not None:
             break
         else:
@@ -32,7 +37,7 @@ def get_user_inputs():
                 SrtDt = EndDt = None
             else:
                 SrtDt = datetime.strptime(user_Dtinput, "%d-%m-%Y")
-                EndDt = cal_end_date(SrtDt, InvDur)
+                EndDt = ut.cal_end_date(SrtDt, InvDur)
             break
         except ValueError:
             print("Invalid Format, Please enter the date as dd-mm-yyyy")           
@@ -46,7 +51,67 @@ def get_user_inputs():
         "End_Date" : EndDt
         }
 
-            
+
+# ---------- Public Interface ---------- #
+
+def calculate_fd_returns(fd_dict):
+        formatted_duration = ut.cal_duration_totalDays(fd_dict["investment_duration"])
+        
+        results = {}
+
+        # Single payout (quarterly compounding)
+        maturity_value, total_interest = fdc.singlePayout_calc(
+            fd_dict["principal"],
+            fd_dict["interest_rate"], 
+            formatted_duration["total_days"], 
+            comp_Factor = QUARTERLY
+        )
+
+        results["single"] = {
+            "maturity_value": maturity_value,
+            "total_interest": total_interest
+        }
+
+        # Bi-annual payout
+        bi_total, bi_payout = fdc.biannualPayout_calc(
+            fd_dict["principal"], 
+            fd_dict["interest_rate"], 
+            formatted_duration["total_days"]
+        )
+
+        results["biannual"] = {
+            "payout_per_period": bi_payout,
+            "total_interest": bi_total
+        }
+
+        # Quarterly payout
+        q_total, q_payout = fdc.quarterlyPayout_calc(
+            fd_dict["principal"], 
+            fd_dict["interest_rate"], 
+            formatted_duration["total_days"]
+        )
+
+        results["quarterly"] = {
+            "payout_per_period": q_payout,
+            "total_interest": q_total
+        }
+
+        # Monthly payout
+        m_total, m_payout = fdc.monthlyPayout_calc(
+            fd_dict["principal"], 
+            fd_dict["interest_rate"], 
+            formatted_duration["total_days"]
+        )
+
+        results["monthly"] = {
+            "payout_per_period": m_payout,
+            "total_interest": m_total
+        }
+
+        results["end_date"] = ut.cal_end_date(fd_dict["start_date"],formatted_duration)
+
+        return results
+   
               
 def main():
    user_data = get_user_inputs()
